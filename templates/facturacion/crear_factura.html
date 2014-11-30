@@ -185,19 +185,15 @@
                         <table class="table">
                             <tr>
                                 <th style="width:50%">Subtotal:</th>
-                                <td> $250.30</td>
+                                <td> <label id='sum-subtotal'>.00</label></td>
                             </tr>
                             <tr>
-                                <th>Tax (9.3%)</th>
-                                <td>$00.00</td>
+                                <th>Tax (18.00%)</th>
+                                <td><label id='sum-tax'>.00</label></td>
                             </tr>
                             <tr>
-                                <th>Shipping:</th>
-                                <td>$0.80</td>
-                            </tr>
-                            <tr>
-                                <th>Total:</th>
-                                <td>$00.00</td>
+                                <th>Total: $</th>
+                                <td><label id='sum-total'>.00</label></td>
                             </tr>
                         </table>
                     </div>
@@ -385,9 +381,10 @@
                 }   
             });
             */
-                        
+            calTotal();           
         });
-        calTotal();     
+           
+
 
     });   
 
@@ -398,10 +395,19 @@
 
     var total = 0;
     function calTotal(){
+        var total=0;
+        var t=0;
         $('#tb-detalle tbody tr').each(function () {
-            total = total + $(this).find("td").eq(6).html();     
-            console.log(total);
+            total = total*1 + $(this).find("td").eq(6).html()*1;    
+            t = t*1 + $(this).find("td").eq(5).html()*1; 
+            
         });
+        $('#sum-subtotal').text(total-t);
+        $('#sum-tax').text(t);
+
+        $('#sum-total').text(total);
+
+
     }
 
 
