@@ -24,7 +24,7 @@ class ProductoAdmin(admin.TabularInline):
 
 admin.site.register(Factura, FacturaAdmin)
 
-admin.site.register(Producto)
+
 admin.site.register(CategoriaProducto)
 
 
@@ -35,3 +35,12 @@ class ClienteAdmin(admin.ModelAdmin):
         'razon_social', 'ruc', 'direccion', 'telefono',)
 
 admin.site.register(Cliente, ClienteAdmin)
+
+
+class ProductoAdminx(admin.ModelAdmin):
+
+    search_fields = ('code', 'nombre',)
+    list_display = (
+        'code', 'number', 'categoria', 'nombre', 'precio', 'igv',)
+
+admin.site.register(Producto, ProductoAdminx)

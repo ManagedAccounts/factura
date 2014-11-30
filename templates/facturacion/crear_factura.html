@@ -344,7 +344,7 @@
 
             cell2.innerHTML = d[d.length-1].nombre;
             cell3.innerHTML = d[d.length-1].pk;
-            cell4.innerHTML = "$" + [d[d.length-1].precio + (d[d.length-1].precio * (d[d.length-1].igv / 100))];
+            cell4.innerHTML = "$" + [d[d.length-1].precio];
 
             if($('#p-cantidad').val() == ''){
                 d[d.length-1].cantidad = 1;
@@ -367,8 +367,8 @@
                 }
             }); 
             */
-            cell6.innerHTML = d[d.length-1].igv;
-            cell7.innerHTML = d[d.length-1].precio+d[d.length-1].igv;
+            cell6.innerHTML = d[d.length-1].igv*1;
+            cell7.innerHTML = (d[d.length-1].precio*1+d[d.length-1].igv*1)*d[d.length-1].cantidad*1;
 
             var html = ""
             $('#producto-resultado').html(html);
