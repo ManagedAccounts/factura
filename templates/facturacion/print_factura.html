@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% block titulo %}Buscar Factura de Venta {% endblock %}
+{% block subtitulo %}
+<form action="/factura/consultar" method="post">
+                                        {% csrf_token %}
+Serie:<input name="serie" id="p-serie" placeholder="Serie" type="text" required="true">
+Num:<input name="num" id="p-num" placeholder="Numero" type="text" required="true">
+        
+        <button type="submit">
+                        <i class="fa fa-search"></i>
+                    </button>
+                    <a href="/admin/factura/factura/"><i class="fa fa-circle text-success"></i> Ver Todos</a>
+   </form>
+
+
+{% endblock %}
+{% block contenido %}
+{% load humanize %}
+    {% if user.is_authenticated %}
+
+        
+
+        {% if messages %}{% for message in messages %}
+          <div class="alert alert-danger alert-dismissable">
+          <i class="fa fa-info"></i>
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <b>Alert!</b> {{ message }}
+          </div>
+      {% endfor %}{% endif %}
+
+        <!-- Main content -->
+        <section class="content invoice">                    
+            <!-- title row -->
+            <div class="row">
+                <div class="col-xs-12">
+                    <h2 class="page-header">
+                        <i class="fa fa-globe"></i> ABC. 
+                        <small class="pull-right">Fecha impresión: {% now "d/m/Y" %}</small>
+                    </h2>                            
+                </div><!-- /.col -->
+            </div>
+            <!-- info row -->
+            <div class="row invoice-info">
+                <div class="col-sm-4 invoice-col">
+                    <b>Factura</b> <br/>
+
+                    Serie: {{factura.serie}}<br/>
+                    Num: {{factura.numero}}<br/>
+                    <b>Fecha de compra:</b> {{factura.fecha|date:"d/m/Y"}}<br/><br/>
+                    
+
+                </div><!-- /.col -->
+
+                <div class="col-sm-4 invoice-col">
+                    <strong>Cliente</strong>
+                             
+                    <br>
+                    Identificación: <span id="c-id">{{factura.cliente.ruc}}</span><br/>                    
+                    Razón Social: <span id="c-razon_social">{{factura.cliente.razon_social}}</span><br/>
+                    Dirección: <span id="c-direccion">{{factura.cliente.direccion}}</span><br/>
+                    Teléfono: <span id="c-telefono">{{factura.cliente.telefono}}</span><br/>
+                </div><!-- /.col -->
+
+
+                <div class="col-sm-4 invoice-col">
+                    <strong>Despachador</strong><br>
+                    Apellido: {{factura.vendedor.last_name}}<br>
+                    Nombre: {{factura.vendedor.first_name}}<br>
+                    
+                </div><!-- /.col -->
+                
+            </div><!-- /.row -->
+
+            <!-- Table row -->
+            <div class="row">
+                <div class="col-xs-12 table-responsive">
+                    <table class="table table-striped" id="tb-detalle">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Producto</th>
+                                <th>Serial #</th>
+                                <th>Precio</th>
+                                <th>Cantidad</th>
+                                <th>IGV</th>
+                                <th>Subtotal</th>
+                            </tr>                                    
+                        </thead>
+                        <tbody>
+            {% for d in detalles %}       
+            <tr>
+                <td>
+                    {{ forloop.counter }}
+                    
+                </td>
+                <td>{{ d.producto.nombre  }} </td>
+                <td>{{ d.producto.pk  }} </td>
+                <td align="right">{{ d.producto.precio|floatformat:2|intcomma  }} </td>
+                <td align="center">{{ d.cantidad  }} </td>
+                <td align="right">{{ d.impuesto|floatformat:2|intcomma  }} </td>
+                <td align="right">{{ d.subtotal|floatformat:2|intcomma  }} </td>
+
+            </tr>
+            {% endfor %}
+                        </tbody>
+                    </table>                            
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+
+            <div class="row">
+                <!-- accepted payments column -->
+                <div class="col-xs-6">
+                    <p class="text-muted well well-sm no-shadow" style="margin-top: 10px;">
+                        No se realiza cambio ni devolución de dinero por los productos adquiridos, por favor verifique el estado de cada uno de los items de su compra.
+                    </p>
+                </div><!-- /.col -->
+                <div class="col-xs-6">
+                    <p class="lead">Totales de la compra</p>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <tr>
+                                <th >Subtotal:</th>
+                                <td align="right"><b>{{sum_subtotal|floatformat:2|intcomma}}</b></td>
+                            </tr>
+                            <tr>
+                                <th>IGV</th>
+                                <td align="right"><b>{{sum_tax|floatformat:2|intcomma}}</b></td>
+                            </tr>
+                            <tr>
+                                <th>Total: $</th>
+                                <td align="right"><b>{{factura.total|floatformat:2|intcomma}}</b></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+
+            <!-- this row will not appear when printing -->
+            <div class="row no-print">
+                <div class="col-xs-12">
+
+                    <button class="btn btn-primary pull-right" style="margin-right: 5px;" onclick="window.print();"><i class="fa fa-download"></i> Generate PDF</button>
+                </div>
+            </div>
+
+        </form>
+        </section><!-- /.content -->
+
+
+
+
+
+    {% else %}
+
+
+    {% endif %}
+
+{% endblock %}
+
+{% block js %}
+
+
+{% endblock %}

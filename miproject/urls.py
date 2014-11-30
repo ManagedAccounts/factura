@@ -20,6 +20,7 @@ urlpatterns = patterns(
     url(r'^factura/buscar_cliente$', 'apps.factura.views.buscarCliente'),
     url(r'^factura/buscar_producto$', 'apps.factura.views.buscarProducto'),
 
+    url(r'^factura/consultar$', 'apps.factura.views.consultarFactura', name="consultar_factura"),    
 
 
 

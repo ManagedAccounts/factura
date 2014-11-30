@@ -2,25 +2,19 @@
 {% block titulo %}Factura de Venta {% endblock %}
 {% block subtitulo %} Facturación{% endblock %}
 {% block contenido %}
+{% load humanize %}
     {% if user.is_authenticated %}
 
-        {% if message != None %}
-            {% if mess_tipo == 1 %}
-                <div class="alert alert-danger alert-dismissable">
-                    <i class="fa fa-info"></i>
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                    <b>Alert!</b> {{ message }}
-                </div>
-            {% endif %}
-            {% if mess_tipo == 2 %}
-                <div class="alert alert-success alert-dismissable">
-                    <i class="fa fa-info"></i>
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                    <b>Alert!</b> {{ message }}
-                </div>
-            {% endif %}
+        
 
-        {% endif %}
+        {% if messages %}{% for message in messages %}
+          <div class="alert alert-danger alert-dismissable">
+          <i class="fa fa-info"></i>
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <b>Alert!</b> {{ message }}
+          </div>
+      {% endfor %}{% endif %}
+
         <!-- Main content -->
         <section class="content invoice">                    
             <!-- title row -->
@@ -35,11 +29,51 @@
             <!-- info row -->
             <div class="row invoice-info">
                 <div class="col-sm-4 invoice-col">
-                    <strong>Despachador</strong><br>
-                    Apellido: {{user.last_name}}<br>
-                    Nombre: {{user.first_name}}<br>
+                    <b>Factura</b> <br/>
+
+                    Serie:<input name="p-serie" id="p-serie" placeholder="Serie" type="text" required="true"><br/>
+                    Num:<input name="p-num" id="p-num" placeholder="Numero" type="text" required="true">
+                    <br/>
+                    <b>Fecha de compra:</b> {% now "d/m/Y" %}<br/><br/>
                     
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="buscarProductoModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal">
+                                        <span aria-hidden="true">&times;</span>
+                                        <span class="sr-only">Cancelar</span>
+                                    </button>
+                                    <h4 class="modal-title" id="myModalLabel">Buscar Producto</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="input-group">
+                                        <input name="producto" id="producto-id" class="form-control" placeholder="Ingrese nombre del producto" type="text">
+                                        <span class="input-group-btn">
+                                            <button name="seach" id="p-buscar" class="btn btn-flat"><i class="fa fa-search"></i></button>
+                                        </span>
+                                    </div>
+                                    <div id="producto-resultado"></div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                                        Cancelar
+                                    </button>
+                                    <button type="button" class="btn btn-primary" id="p-seleccionar" disabled>
+                                        Seleccionar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#buscarProductoModal">
+                        Seleccionar Producto
+                    </button>
+
                 </div><!-- /.col -->
+
                 <div class="col-sm-4 invoice-col">
                     <strong>Cliente</strong>
                     <!-- Modal -->
@@ -101,54 +135,22 @@
                             </div>
                         </div>
                     </div>
-                    <button data-toggle="modal" data-target="#crearProductoModal">
-                        Crear Producto
-                    </button>                    
+                                        
                     <br>
                     Identificación: <span id="c-id"></span><br/>                    
                     razon_social: <span id="c-razon_social"></span><br/>
                     direccion: <span id="c-direccion"></span><br/>
                     telefono: <span id="c-telefono"></span><br/>
                 </div><!-- /.col -->
-                <div class="col-sm-4 invoice-col">
-                    <b>Factura #{{ sqfactura }}</b><br/>
-                    <b>Fecha de compra:</b> {% now "d/m/Y" %}<br/><br/>
-                    <!-- Modal -->
-                    <div class="modal fade" id="buscarProductoModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <button type="button" class="close" data-dismiss="modal">
-                                        <span aria-hidden="true">&times;</span>
-                                        <span class="sr-only">Cancelar</span>
-                                    </button>
-                                    <h4 class="modal-title" id="myModalLabel">Buscar Producto</h4>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="input-group">
-                                        <input name="producto" id="producto-id" class="form-control" placeholder="Ingrese nombre del producto" type="text">
-                                        <span class="input-group-btn">
-                                            <button name="seach" id="p-buscar" class="btn btn-flat"><i class="fa fa-search"></i></button>
-                                        </span>
-                                    </div>
-                                    <div id="producto-resultado"></div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-default" data-dismiss="modal">
-                                        Cancelar
-                                    </button>
-                                    <button type="button" class="btn btn-primary" id="p-seleccionar" disabled>
-                                        Seleccionar
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#buscarProductoModal">
-                        Seleccionar Producto
-                    </button>
 
+
+                <div class="col-sm-4 invoice-col">
+                    <strong>Despachador</strong><br>
+                    Apellido: {{request.user.last_name}}<br>
+                    Nombre: {{request.user.first_name}}<br>
+                    
                 </div><!-- /.col -->
+                
             </div><!-- /.row -->
 
             <!-- Table row -->
@@ -185,15 +187,15 @@
                         <table class="table">
                             <tr>
                                 <th style="width:50%">Subtotal:</th>
-                                <td> <label id='sum-subtotal'>.00</label></td>
+                                <td align="right"> <label id='sum-subtotal'>.00</label></td>
                             </tr>
                             <tr>
                                 <th>Tax (18.00%)</th>
-                                <td><label id='sum-tax'>.00</label></td>
+                                <td align="right"><label id='sum-tax'>.00</label></td>
                             </tr>
                             <tr>
                                 <th>Total: $</th>
-                                <td><label id='sum-total'>.00</label></td>
+                                <td align="right"><label id='sum-total'>.00</label></td>
                             </tr>
                         </table>
                     </div>
@@ -337,10 +339,16 @@
             var cell5 = row.insertCell(4);
             var cell6 = row.insertCell(5);
             var cell7 = row.insertCell(6);
+            //cell7.className = 'right';
+            cell4.setAttribute('align','right');
+            cell5.setAttribute('align','center');
+            cell6.setAttribute('align','right');
+            cell7.setAttribute('align','right');
 
+            cell1.innerHTML = rowCount+1;
             cell2.innerHTML = d[d.length-1].nombre;
             cell3.innerHTML = d[d.length-1].pk;
-            cell4.innerHTML = "$" + [d[d.length-1].precio];
+            cell4.innerHTML = "$" + [round(d[d.length-1].precio,2).toFixed(2)];
 
             if($('#p-cantidad').val() == ''){
                 d[d.length-1].cantidad = 1;
@@ -363,8 +371,8 @@
                 }
             }); 
             */
-            cell6.innerHTML = d[d.length-1].igv*1;
-            cell7.innerHTML = (d[d.length-1].precio*1+d[d.length-1].igv*1)*d[d.length-1].cantidad*1;
+            cell6.innerHTML = round(d[d.length-1].igv,2).toFixed(2);
+            cell7.innerHTML = round((d[d.length-1].precio*1+d[d.length-1].igv*1)*d[d.length-1].cantidad*1,2).toFixed(2);
 
             var html = ""
             $('#producto-resultado').html(html);
@@ -381,6 +389,7 @@
                 }   
             });
             */
+            proceso.producto.push({'serial': d[d.length-1].pk, 'cantidad': d[d.length-1].cantidad});
             calTotal();           
         });
            
@@ -389,6 +398,8 @@
     });   
 
     function onEnviar(){
+        proceso.serie = $('#p-serie').val();
+        proceso.numero = $('#p-num').val();
         console.log(JSON.stringify(proceso));
        document.getElementById("proceso").value=JSON.stringify(proceso);
     }
@@ -402,15 +413,32 @@
             t = t*1 + $(this).find("td").eq(5).html()*1; 
             
         });
-        $('#sum-subtotal').text(total-t);
-        $('#sum-tax').text(t);
+        $('#sum-subtotal').text((total-t).toFixed(2));
+        $('#sum-tax').text(t.toFixed(2));
 
-        $('#sum-total').text(total);
+        $('#sum-total').text(total.toFixed(2));
 
 
     }
 
+function round(value, exp) {
+  if (typeof exp === 'undefined' || +exp === 0)
+    return Math.round(value);
 
+  value = +value;
+  exp  = +exp;
+
+  if (isNaN(value) || !(typeof exp === 'number' && exp % 1 === 0))
+    return NaN;
+
+  // Shift
+  value = value.toString().split('e');
+  value = Math.round(+(value[0] + 'e' + (value[1] ? (+value[1] + exp) : exp)));
+
+  // Shift back
+  value = value.toString().split('e');
+  return +(value[0] + 'e' + (value[1] ? (+value[1] - exp) : -exp));
+}
 
     </script>
 
