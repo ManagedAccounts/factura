@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
+admin.autodiscover()
 
 urlpatterns = patterns(
     '',
@@ -16,6 +17,8 @@ urlpatterns = patterns(
 
     url(r'^factura/venta$', 'apps.factura.views.facturaCrear',
         name="factura_venta"),
+    url(r'^factura/buscar_cliente$', 'apps.factura.views.buscarCliente'),
+    url(r'^factura/buscar_producto$', 'apps.factura.views.buscarProducto'),
 
 
 

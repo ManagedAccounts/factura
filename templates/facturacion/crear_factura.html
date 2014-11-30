@@ -38,9 +38,7 @@
                     <strong>Despachador</strong><br>
                     Apellido: {{user.last_name}}<br>
                     Nombre: {{user.first_name}}<br>
-                    Identificación: {{user.get_profile.numIdentificacion}}<br/>
-                    Cargo: {{user.get_profile.cargo.nombre}}<br/>
-                    Sede: {{user.get_profile.sede}}<br/>
+                    
                 </div><!-- /.col -->
                 <div class="col-sm-4 invoice-col">
                     <strong>Cliente</strong>
@@ -57,7 +55,7 @@
                                 </div>
                                 <div class="modal-body">
                                     <div class="input-group">
-                                        <input name="cliente" id="cliente-id" class="form-control" placeholder="Ingrese numero de identificación" type="text">
+                                        <input name="cliente" id="cliente-id" class="form-control" placeholder="Ingrese numero de ruc" type="text">
                                         <span class="input-group-btn">
                                             <button name="seach" id="c-buscar" class="btn btn-flat"><i class="fa fa-search"></i></button>
                                         </span>
@@ -108,9 +106,9 @@
                     </button>                    
                     <br>
                     Identificación: <span id="c-id"></span><br/>                    
-                    Apellido: <span id="c-apellido"></span><br/>
-                    Nombre: <span id="c-nombre"></span><br/>
-                    Email: <span id="c-email"></span><br/>
+                    razon_social: <span id="c-razon_social"></span><br/>
+                    direccion: <span id="c-direccion"></span><br/>
+                    telefono: <span id="c-telefono"></span><br/>
                 </div><!-- /.col -->
                 <div class="col-sm-4 invoice-col">
                     <b>Factura #{{ sqfactura }}</b><br/>
@@ -128,7 +126,7 @@
                                 </div>
                                 <div class="modal-body">
                                     <div class="input-group">
-                                        <input name="producto" id="producto-id" class="form-control" placeholder="Ingrese numero del producto" type="text">
+                                        <input name="producto" id="producto-id" class="form-control" placeholder="Ingrese nombre del producto" type="text">
                                         <span class="input-group-btn">
                                             <button name="seach" id="p-buscar" class="btn btn-flat"><i class="fa fa-search"></i></button>
                                         </span>
@@ -159,12 +157,12 @@
                     <table class="table table-striped" id="tb-detalle">
                         <thead>
                             <tr>
-                                <th>Consecutivo</th>
+                                <th>#</th>
                                 <th>Producto</th>
                                 <th>Serial #</th>
                                 <th>Precio</th>
                                 <th>Cantidad</th>
-                                <th>Descuento</th>
+                                <th>IGV</th>
                                 <th>Subtotal</th>
                             </tr>                                    
                         </thead>
@@ -257,16 +255,16 @@
                         for (var i = 0; i < data.length; i++) {
                             html += '<strong>Cliente</strong><br>';
                             html += 'numeroid: ' + data[i].pk + '<br>';
-                            html += 'Apellido: ' + data[i].fields.apellido + '<br>';
-                            html += 'Nombre: ' + data[i].fields.nombre + '<br>';
-                            html += 'Email: ' + data[i].fields.email + '<br>';
-                            html += 'Identificación: ' + data[i].fields.numIdentificacion + '<br>';
+                            html += 'razon_social: ' + data[i].fields.razon_social + '<br>';
+                            html += 'direccion: ' + data[i].fields.direccion + '<br>';
+                            html += 'telefono: ' + data[i].fields.telefono + '<br>';
+                            html += 'Identificación: ' + data[i].fields.ruc + '<br>';
 
                             cliente.pk = data[i].pk;
-                            cliente.numIdentificacion = data[i].fields.numIdentificacion;
-                            cliente.apellido = data[i].fields.apellido;
-                            cliente.nombre = data[i].fields.nombre;
-                            cliente.email = data[i].fields.email;
+                            cliente.ruc = data[i].fields.ruc;
+                            cliente.razon_social = data[i].fields.razon_social;
+                            cliente.direccion = data[i].fields.direccion;
+                            cliente.telefono = data[i].fields.telefono;
                         }  
                         $("#c-seleccionar").attr("disabled", false);
                     }else{
@@ -281,10 +279,10 @@
         $("#c-seleccionar").click(function () {
             //console.log(cliente.numIdentificacion);
             proceso.clienProv = cliente.pk;
-            $("#c-id").text(cliente.numIdentificacion);
-            $("#c-apellido").text(cliente.apellido);
-            $("#c-nombre").text(cliente.nombre);
-            $("#c-email").text(cliente.email);
+            $("#c-id").text(cliente.ruc);
+            $("#c-razon_social").text(cliente.razon_social);
+            $("#c-direccion").text(cliente.direccion);
+            $("#c-telefono").text(cliente.telefono);
             $('#buscarClienteModal').modal('hide');
         });
 
@@ -300,7 +298,7 @@
                     if(data.length != 0){
                         for (var i = 0; i < data.length; i++) {
                             html += '<strong>Producto</strong><br>';
-                            html += 'Numero Serial: ' + data[i].pk + '<br>';
+                            html += 'Serial: ' + data[i].pk + '<br>';
                             html += 'Nombre: ' + data[i].fields.nombre + '<br>';
                             html += 'Precio: ' + data[i].fields.precio + '<br>';
                             html += '<input name="p-cantidad" id="p-cantidad" placeholder="Cantidad" type="text">';
@@ -309,7 +307,7 @@
                             fila.pk = data[i].pk;
                             fila.nombre = data[i].fields.nombre;
                             fila.precio = data[i].fields.precio;
-                            fila.ganancia = data[i].fields.ganancia;
+                            fila.igv = data[i].fields.igv;
                             fila.cantidad = 1;
                             fila.descuento = 0;
 
@@ -318,7 +316,7 @@
                         $('#producto-resultado').html(html); 
                         $("#p-seleccionar").attr("disabled", false);
                     }else{
-                        html += '<strong>No existe un cliente con ese numero de identificación</strong><br>';
+                        html += '<strong>No existe producto con ese code</strong><br>';
                         //html += '<a class="btn btn-primary" style="margin-right: 5px;" href=""> Crear Producto</a>';
                         
                         $("#p-seleccionar").attr("disabled", true);
@@ -346,7 +344,7 @@
 
             cell2.innerHTML = d[d.length-1].nombre;
             cell3.innerHTML = d[d.length-1].pk;
-            cell4.innerHTML = "$" + [d[d.length-1].precio + (d[d.length-1].precio * (d[d.length-1].ganancia / 100))];
+            cell4.innerHTML = "$" + [d[d.length-1].precio + (d[d.length-1].precio * (d[d.length-1].igv / 100))];
 
             if($('#p-cantidad').val() == ''){
                 d[d.length-1].cantidad = 1;
@@ -355,7 +353,7 @@
                 d[d.length-1].cantidad = $('#p-cantidad').val();
                 cell5.innerHTML = d[d.length-1].cantidad;
             }
-
+            /*
             $.ajax({
                 data: {'descuento': $('#p-cantidad').val()},
                 url:"/factura/descuento",                
@@ -367,7 +365,10 @@
                     cell7.innerHTML = [([d[d.length-1].precio + (d[d.length-1].precio * (d[d.length-1].ganancia / 100))] * d[d.length-1].cantidad) - (([d[d.length-1].precio + (d[d.length-1].precio * (d[d.length-1].ganancia / 100))] * d[d.length-1].cantidad) * (d[d.length-1].descuento / 100))];
 
                 }
-            });  
+            }); 
+            */
+            cell6.innerHTML = d[d.length-1].igv;
+            cell7.innerHTML = d[d.length-1].precio+d[d.length-1].igv;
 
             var html = ""
             $('#producto-resultado').html(html);
@@ -375,6 +376,7 @@
             $("#p-seleccionar").attr("disabled", true);
             $('#buscarProductoModal').modal('hide');
 
+            /*
             $.ajax({                
                 url:"/factura/secuencia_item",
                 success:function(data){
@@ -382,7 +384,7 @@
                     proceso.producto.push({'item': data.item, 'serial': d[d.length-1].pk, 'cantidad': d[d.length-1].cantidad});
                 }   
             });
-            
+            */
                         
         });
         calTotal();     
