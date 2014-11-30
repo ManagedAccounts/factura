@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block titulo %}Factura de Compra {% endblock %}
+{% block subtitulo %} Facturación{% endblock %}
+{% block contenido %}
+    {% if user.is_authenticated %}
+        <form action="/producto/crear" method="post">
+            {% csrf_token %}
+            {{ form }}
+            <input type="submit" value="Submit" />
+        </form>    
+    {% else %}
+
+
+    {% endif %}
+
+{% endblock %}
+
+{% block js %}
+
+{% endblock %}

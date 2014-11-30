@@ -1,0 +1,309 @@
+{% extends 'base.html' %}
+{% block titulo %}Factura de Compra {% endblock %}
+{% block subtitulo %} Facturación{% endblock %}
+{% block contenido %}
+    {% if user.is_authenticated %}
+        {% if message != None %}
+            {% if mess_tipo == 1 %}
+                <div class="alert alert-danger alert-dismissable">
+                    <i class="fa fa-info"></i>
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <b>Alert!</b> {{ message }}
+                </div>
+            {% endif %}
+            {% if mess_tipo == 2 %}
+                <div class="alert alert-success alert-dismissable">
+                    <i class="fa fa-info"></i>
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <b>Alert!</b> {{ message }}
+                </div>
+            {% endif %}
+
+        {% endif %}
+        <!-- Main content -->
+        <section class="content invoice">                    
+            <!-- title row -->
+            <div class="row">
+                <div class="col-xs-12">
+                    <h2 class="page-header">
+                        <i class="fa fa-globe"></i> El Que Copia Pierde SAS.
+                        <small class="pull-right">Fecha: {% now "d/m/Y" %}</small>
+                    </h2>                            
+                </div><!-- /.col -->
+            </div>
+            <!-- info row -->
+            <div class="row invoice-info">
+                <div class="col-sm-4 invoice-col">
+                    <strong>Despachador</strong><br>
+                    Apellido: {{user.last_name}}<br>
+                    Nombre: {{user.first_name}}<br>
+                    Identificación: {{user.get_profile.numIdentificacion}}<br/>
+                    Cargo: {{user.get_profile.cargo.nombre}}
+                </div><!-- /.col -->
+                <div class="col-sm-4 invoice-col">
+                    <strong>Proveedor</strong>
+                    <!-- Modal -->
+                    <div class="modal fade" id="buscarClienteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal">
+                                        <span aria-hidden="true">&times;</span>
+                                        <span class="sr-only">Cancelar</span>
+                                    </button>
+                                    <h4 class="modal-title" id="myModalLabel">Buscar Proveedor</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="input-group">
+                                        <input name="cliente" id="cliente-id" class="form-control" placeholder="Ingrese numero de identificación" type="text">
+                                        <span class="input-group-btn">
+                                            <button name="seach" id="c-buscar" class="btn btn-flat"><i class="fa fa-search"></i></button>
+                                        </span>
+                                    </div>
+                                    <div id="cliente-resultado"></div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                                        Cancelar
+                                    </button>
+                                    <button type="button" class="btn btn-primary" id="c-seleccionar" disabled>
+                                        Seleccionar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button data-toggle="modal" data-target="#buscarClienteModal">
+                        <i class="fa fa-search"></i>
+                    </button><br>
+                    Identificación: <span id="c-id"></span><br/>                    
+                    Apellido: <span id="c-apellido"></span><br/>
+                    Nombre: <span id="c-nombre"></span><br/>
+                    Email: <span id="c-email"></span><br/>
+                </div><!-- /.col -->
+                <div class="col-sm-4 invoice-col">
+                    <b>Factura #{{ sqfactura }}</b><br/>
+                    <b>Fecha de compra:</b> {% now "d/m/Y" %}<br/><br/>
+                    <!-- Modal -->
+                    <div class="modal fade" id="buscarProductoModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal">
+                                        <span aria-hidden="true">&times;</span>
+                                        <span class="sr-only">Cancelar</span>
+                                    </button>
+                                    <h4 class="modal-title" id="myModalLabel">Buscar Producto</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="input-group">
+                                        <input name="producto" id="producto-id" class="form-control" placeholder="Ingrese numero del producto" type="text">
+                                        <span class="input-group-btn">
+                                            <button name="seach" id="p-buscar" class="btn btn-flat"><i class="fa fa-search"></i></button>
+                                        </span>
+                                    </div>
+                                    <div id="producto-resultado"></div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                                        Cancelar
+                                    </button>
+                                    <button type="button" class="btn btn-primary" id="p-seleccionar" disabled>
+                                        Seleccionar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#buscarProductoModal">
+                        Seleccionar Producto
+                    </button>
+
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+
+            <!-- Table row -->
+            <div class="row">
+                <div class="col-xs-12 table-responsive">
+                    <table class="table table-striped" id="tb-detalle">
+                        <thead>
+                            <tr>
+                                <th>Consecutivo</th>
+                                <th>Producto</th>
+                                <th>Serial #</th>
+                                <th>Precio</th>
+                                <th>Cantidad</th>
+                            </tr>                                    
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>                            
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+
+            <!-- this row will not appear when printing -->
+            <div class="row no-print">
+                <div class="col-xs-12">
+                    <form action="/facturacion/orden" method="post" onsubmit="onEnviar()">
+                        {% csrf_token %}
+                        <input id="proceso" name="proceso" type="hidden" />
+                        <button class="btn btn-success pull-right" id="comprar"><i class="fa fa-credit-card"></i> Crear Orden</button>  
+                    </form>
+                    <button class="btn btn-primary pull-right" style="margin-right: 5px;" onclick="window.print();"><i class="fa fa-download"></i> Generate PDF</button>
+                </div>
+            </div>
+        </section><!-- /.content -->
+
+    {% else %}
+
+
+    {% endif %}
+
+{% endblock %}
+
+{% block js %}
+<script>
+    var proceso = new Object();
+
+    proceso.tipoPro = 2;
+    proceso.producto = new Array();
+
+    var table = new Array();
+    var cliente = new Object();
+
+    $(document).ready(function(){
+        $("#c-buscar").click(function () {          
+                
+            var id = $('#cliente-id').val();
+            $.ajax({
+                data: {'id':id},
+                url: '/facturacion/buscar_proveedor',
+                type: 'get',
+                success: function(data){
+                    //console.log(JSON.stringify(data));
+                    var html = ""
+                    if(data.length != 0){
+                        for (var i = 0; i < data.length; i++) {
+                            html += '<strong>Cliente</strong><br>';
+                            html += 'Apellido: ' + data[i].pk + '<br>';
+                            html += 'Apellido: ' + data[i].fields.apellido + '<br>';
+                            html += 'Nombre: ' + data[i].fields.nombre + '<br>';
+                            html += 'Email: ' + data[i].fields.email + '<br>';
+                            html += 'Identificación: ' + data[i].fields.numIdentificacion + '<br>';
+
+                            cliente.pk = data[i].pk;
+                            cliente.numIdentificacion = data[i].fields.numIdentificacion;
+                            cliente.apellido = data[i].fields.apellido;
+                            cliente.nombre = data[i].fields.nombre;
+                            cliente.email = data[i].fields.email;
+                        }  
+                        $("#c-seleccionar").attr("disabled", false);
+                    }else{
+                        html += '<strong>No existe un proveedor con ese numero de identificación</strong><br><button class="btn btn-primary" style="margin-right: 5px;"> Crear Proveedor</button>';
+                        $("#c-seleccionar").attr("disabled", true);
+                    }
+                    $('#cliente-resultado').html(html); 
+                }
+            });            
+        });
+
+        $("#c-seleccionar").click(function () {
+            //console.log(cliente.numIdentificacion);
+            proceso.clienProv = cliente.pk;
+            $("#c-id").text(cliente.numIdentificacion);
+            $("#c-apellido").text(cliente.apellido);
+            $("#c-nombre").text(cliente.nombre);
+            $("#c-email").text(cliente.email);
+            $('#buscarClienteModal').modal('hide');
+        });
+
+        $("#p-buscar").click(function () {
+            var id = $('#producto-id').val();
+            $.ajax({
+                data: {'id':id},
+                url: '/facturacion/buscar_producto',
+                type: 'get',
+                success: function(data){
+                    console.log(JSON.stringify(data));                    
+                    var html = ""
+                    if(data.length != 0){
+                        for (var i = 0; i < data.length; i++) {
+                            html += '<strong>Producto</strong><br>';
+                            html += 'Numero Serial: ' + data[i].pk + '<br>';
+                            html += 'Nombre: ' + data[i].fields.nombre + '<br>';
+                            html += 'Precio: ' + data[i].fields.precio + '<br>';
+                            html += '<input name="p-cantidad" id="p-cantidad" placeholder="Cantidad" type="text">';
+
+                            var fila = new Object();
+                            fila.pk = data[i].pk;
+                            fila.nombre = data[i].fields.nombre;
+                            fila.precio = data[i].fields.precio;
+                            fila.ganancia = data[i].fields.ganancia;
+                            fila.cantidad = 1;
+
+                            table.push(fila);
+                        }
+                        $('#producto-resultado').html(html); 
+                        $("#p-seleccionar").attr("disabled", false);
+                    }else{
+                        html += '<strong>No existe un producto con ese numero de identificación</strong><br>';
+                        //html += '<a class="btn btn-primary" style="margin-right: 5px;" href="{% url "crear_producto" %}"> Crear Producto</a>';
+                        $("#p-seleccionar").attr("disabled", true);
+                    }
+                    $('#producto-resultado').html(html); 
+                }
+            });     
+        });   
+
+
+        $("#p-seleccionar").click(function () {
+            var d = table;
+            var t = document.getElementById('tb-detalle').getElementsByTagName('tbody')[0];
+            var rowCount = t.rows.length;
+
+            var row = t.insertRow(rowCount);
+            
+            var cell1 = row.insertCell(0);
+            var cell2 = row.insertCell(1);
+            var cell3 = row.insertCell(2);
+            var cell4 = row.insertCell(3);
+            var cell5 = row.insertCell(4);
+
+            cell2.innerHTML = d[d.length-1].nombre;
+            cell3.innerHTML = d[d.length-1].pk;
+            cell4.innerHTML = "$" + [d[d.length-1].precio + (d[d.length-1].precio * (d[d.length-1].ganancia / 100))];
+
+            if($('#p-cantidad').val() == ''){
+                d[d.length-1].cantidad = 1;
+                cell5.innerHTML = d[d.length-1].cantidad;
+            }else{
+                d[d.length-1].cantidad = $('#p-cantidad').val();
+                cell5.innerHTML = d[d.length-1].cantidad;
+            }
+  
+
+            var html = ""
+            $('#producto-resultado').html(html);
+            $('#producto-id').val('');
+            $("#p-seleccionar").attr("disabled", true);
+            $('#buscarProductoModal').modal('hide');
+
+            $.ajax({                
+                url:"/facturacion/secuencia_item",
+                success:function(data){
+                    cell1.innerHTML = data.item;
+                    proceso.producto.push({'item': data.item, 'serial': d[d.length-1].pk, 'cantidad': d[d.length-1].cantidad});
+                }   
+            });
+                        
+        });     
+    });   
+
+    function onEnviar(){
+        console.log(JSON.stringify(proceso));
+       document.getElementById("proceso").value=JSON.stringify(proceso);
+    }
+
+
+    </script>
+{% endblock %}

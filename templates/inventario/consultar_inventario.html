@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block titulo %}Inventario {% endblock %}
+{% block subtitulo %} Lista de inventario{% endblock %}
+{% block contenido %}
+    {% if user.is_authenticated %}
+        <!-- Table row -->
+            <div class="row">
+                <div class="col-xs-12 table-responsive">
+                    <table class="table table-striped" id="tb-detalle">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Saldo</th>
+                                <th>Sede</th>
+                            </tr>                                    
+                        </thead>
+                            {% for d in datos %}
+                            <tr>
+                                <th>{{d.producto}}</th>
+                                <th>{{d.cantidad}}</th>
+                                <th>{{d.saldo}}</th>
+                                <th>{{d.sede}}</th>
+                            </tr> 
+
+                            {% endfor%}
+                        <tbody>
+                        </tbody>
+                    </table>                            
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+
+    {% else %}
+
+
+    {% endif %}
+
+{% endblock %}
+
+{% block js %}
+
+{% endblock %}
