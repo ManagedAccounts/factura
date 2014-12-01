@@ -45,8 +45,7 @@ def facturaCrear(request):
 
             for k in proceso['producto']:
                 producto = Producto.objects.get(id=k['serial'])
-                subTotal = (
-                    (producto.igv + producto.precio) * int(k['cantidad']))
+                subTotal = (producto.precio) * int(k['cantidad'])
                 total += subTotal
 
             crearFactura = Factura(
@@ -68,9 +67,8 @@ def facturaCrear(request):
                     descripcion=producto.nombre,
                     precio = producto.precio,
                     cantidad=int(k['cantidad']),
-                    impuesto=producto.igv,
-                    subtotal=(producto.igv + producto.precio) *
-                    int(k['cantidad']),
+                    impuesto=producto.igv* int(k['cantidad']),
+                    subtotal=producto.precio * int(k['cantidad']),
                     factura = crearFactura
                 )
                 crearDetalle.save()

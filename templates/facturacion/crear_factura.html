@@ -146,8 +146,8 @@
 
                 <div class="col-sm-4 invoice-col">
                     <strong>Despachador</strong><br>
-                    Apellido: {{request.user.last_name}}<br>
-                    Nombre: {{request.user.first_name}}<br>
+                    Apellido: {{user.last_name}}<br>
+                    Nombre: {{user.first_name}}<br>
                     
                 </div><!-- /.col -->
                 
@@ -371,8 +371,8 @@
                 }
             }); 
             */
-            cell6.innerHTML = round(d[d.length-1].igv,2).toFixed(2);
-            cell7.innerHTML = round((d[d.length-1].precio*1+d[d.length-1].igv*1)*d[d.length-1].cantidad*1,2).toFixed(2);
+            cell6.innerHTML = round(d[d.length-1].igv*d[d.length-1].cantidad*1,2).toFixed(2);
+            cell7.innerHTML = round((d[d.length-1].precio)*d[d.length-1].cantidad*1,2).toFixed(2);
 
             var html = ""
             $('#producto-resultado').html(html);
