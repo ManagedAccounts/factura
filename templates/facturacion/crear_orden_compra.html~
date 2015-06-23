@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block titulo %}Remisión de Compra {% endblock %}
+{% block titulo %}Factura de Compra {% endblock %}
 {% block subtitulo %} Facturación{% endblock %}
 {% block contenido %}
     {% if user.is_authenticated %}
@@ -19,14 +19,14 @@
                 </div>
             {% endif %}
 
-        {% endif %}    
+        {% endif %}
         <!-- Main content -->
         <section class="content invoice">                    
             <!-- title row -->
             <div class="row">
                 <div class="col-xs-12">
                     <h2 class="page-header">
-                        <i class="fa fa-globe"></i> El Que Copia Pierde SAS.
+                        <i class="fa fa-globe"></i> Sistema S.A.
                         <small class="pull-right">Fecha: {% now "d/m/Y" %}</small>
                     </h2>                            
                 </div><!-- /.col -->
@@ -41,7 +41,7 @@
                     Cargo: {{user.get_profile.cargo.nombre}}
                 </div><!-- /.col -->
                 <div class="col-sm-4 invoice-col">
-                    <strong>Cliente</strong>
+                    <strong>Proveedor</strong>
                     <!-- Modal -->
                     <div class="modal fade" id="buscarClienteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
@@ -51,7 +51,7 @@
                                         <span aria-hidden="true">&times;</span>
                                         <span class="sr-only">Cancelar</span>
                                     </button>
-                                    <h4 class="modal-title" id="myModalLabel">Buscar Cliente</h4>
+                                    <h4 class="modal-title" id="myModalLabel">Buscar Proveedor</h4>
                                 </div>
                                 <div class="modal-body">
                                     <div class="input-group">
@@ -85,7 +85,7 @@
                     <b>Factura #{{ sqfactura }}</b><br/>
                     <b>Fecha de compra:</b> {% now "d/m/Y" %}<br/><br/>
                     <!-- Modal -->
-                    <div class="modal fade" id="buscarRemisionModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal fade" id="buscarProductoModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -93,7 +93,7 @@
                                         <span aria-hidden="true">&times;</span>
                                         <span class="sr-only">Cancelar</span>
                                     </button>
-                                    <h4 class="modal-title" id="myModalLabel">Buscar Remision</h4>
+                                    <h4 class="modal-title" id="myModalLabel">Buscar Producto</h4>
                                 </div>
                                 <div class="modal-body">
                                     <div class="input-group">
@@ -115,8 +115,8 @@
                             </div>
                         </div>
                     </div>
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#buscarRemisionModal">
-                        Seleccionar Remisión
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#buscarProductoModal">
+                        Seleccionar Producto
                     </button>
 
                 </div><!-- /.col -->
@@ -133,7 +133,6 @@
                                 <th>Serial #</th>
                                 <th>Precio</th>
                                 <th>Cantidad</th>
-                                <th>Accion</th>
                             </tr>                                    
                         </thead>
                         <tbody>
@@ -145,20 +144,15 @@
             <!-- this row will not appear when printing -->
             <div class="row no-print">
                 <div class="col-xs-12">
-                    <form action="/facturacion/remision" method="post" onsubmit="onEnviar()">
+                    <form action="/facturacion/orden" method="post" onsubmit="onEnviar()">
                         {% csrf_token %}
                         <input id="proceso" name="proceso" type="hidden" />
-                        <button class="btn btn-success pull-right" id="comprar"><i class="fa fa-credit-card"></i> Realizar Remisión</button>  
+                        <button class="btn btn-success pull-right" id="comprar"><i class="fa fa-credit-card"></i> Crear Orden</button>  
                     </form>
-                    <button class="btn btn-primary pull-right"
-                        style="margin-right: 5px;" onclick="window.print();"><i
-                            class="fa fa-download"></i> Imprimir</button>
+                    <button class="btn btn-primary pull-right" style="margin-right: 5px;" onclick="window.print();"><i class="fa fa-download"></i> Generate PDF</button>
                 </div>
             </div>
         </section><!-- /.content -->
-
-    {% csrf_token %}
-
 
     {% else %}
 
@@ -171,7 +165,7 @@
 <script>
     var proceso = new Object();
 
-    proceso.tipoPro = 3;
+    proceso.tipoPro = 2;
     proceso.producto = new Array();
 
     var table = new Array();
@@ -205,7 +199,7 @@
                         }  
                         $("#c-seleccionar").attr("disabled", false);
                     }else{
-                        html += '<strong>No existe un cliente con ese numero de identificación</strong><br>';
+                        html += '<strong>No existe un proveedor con ese numero de identificación</strong><br><button class="btn btn-primary" style="margin-right: 5px;"> Crear Proveedor</button>';
                         $("#c-seleccionar").attr("disabled", true);
                     }
                     $('#cliente-resultado').html(html); 
@@ -224,25 +218,37 @@
         });
 
         $("#p-buscar").click(function () {
-            var numOrden = $('#producto-id').val();
+            var id = $('#producto-id').val();
             $.ajax({
-                data: {'numOrden':numOrden},
-                url: '/facturacion/buscar_orden',
+                data: {'id':id},
+                url: '/facturacion/buscar_producto',
                 type: 'get',
-                success: function(data){                   
+                success: function(data){
+                    console.log(JSON.stringify(data));                    
                     var html = ""
                     if(data.length != 0){
                         for (var i = 0; i < data.length; i++) {
-                            html += '<strong>Remisión</strong><br>';
-                            html += 'Numero Proceso: ' + data[i].pk + '<br>';
-                            html += 'Total Facturado: ' + data[i].fields.total_facturado + '<br>';
-                            html += '<input type="hidden" name="p-cantidad" id="p-cantidad" placeholder="Cantidad" type="text" value="' + data[i].pk + '">';
+                            html += '<strong>Producto</strong><br>';
+                            html += 'Numero Serial: ' + data[i].pk + '<br>';
+                            html += 'Nombre: ' + data[i].fields.nombre + '<br>';
+                            html += 'Precio: ' + data[i].fields.precio + '<br>';
+                            html += 'Cantidad en Stock: ' + data[i].fields.stock + '<br>';
+                            html += '<input name="p-cantidad" id="p-cantidad" placeholder="Cantidad" type="text">';
 
+                            var fila = new Object();
+                            fila.pk = data[i].pk;
+                            fila.nombre = data[i].fields.nombre;
+                            fila.precio = data[i].fields.precio;
+                            fila.ganancia = data[i].fields.ganancia;
+                            fila.cantidad = 1;
+
+                            table.push(fila);
                         }
                         $('#producto-resultado').html(html); 
                         $("#p-seleccionar").attr("disabled", false);
                     }else{
-                        html += '<strong>No existe un cliente con ese numero de identificación</strong><br>';
+                        html += '<strong>No existe un producto con ese numero de identificación</strong><br>';
+                        //html += '<a class="btn btn-primary" style="margin-right: 5px;" href="{% url "crear_producto" %}"> Crear Producto</a>';
                         $("#p-seleccionar").attr("disabled", true);
                     }
                     $('#producto-resultado').html(html); 
@@ -252,79 +258,53 @@
 
 
         $("#p-seleccionar").click(function () {
-
             var d = table;
             var t = document.getElementById('tb-detalle').getElementsByTagName('tbody')[0];
+            var rowCount = t.rows.length;
 
-            proceso.orden = $('#p-cantidad').val();
+            var row = t.insertRow(rowCount);
+            
+            var cell1 = row.insertCell(0);
+            var cell2 = row.insertCell(1);
+            var cell3 = row.insertCell(2);
+            var cell4 = row.insertCell(3);
+            var cell5 = row.insertCell(4);
 
-            $.ajax({
-                data: {'ordenDetalle': $('#p-cantidad').val()},
-                url:"/facturacion/buscar_orden_detalle",                
-                type: 'get',
-                success:function(data){
-                    
-                    for (var i = 0; i < data.length; i++) {
+            cell2.innerHTML = d[d.length-1].nombre;
+            cell3.innerHTML = d[d.length-1].pk;
+            cell4.innerHTML = "$" + [d[d.length-1].precio + (d[d.length-1].precio * (d[d.length-1].ganancia / 100))];
 
-                        var rowCount = t.rows.length;
-                        var row = t.insertRow(rowCount);
-                        
-                        var cell1 = row.insertCell(0);
-                        var cell2 = row.insertCell(1);
-                        var cell3 = row.insertCell(2);
-                        var cell4 = row.insertCell(3);
-                        var cell5 = row.insertCell(4);
-                        var cell6 = row.insertCell(5);
-                        cell6.className = "eliminar";
+            if($('#p-cantidad').val() == ''){
+                d[d.length-1].cantidad = 1;
+                cell5.innerHTML = d[d.length-1].cantidad;
+            }else{
+                d[d.length-1].cantidad = $('#p-cantidad').val();
+                cell5.innerHTML = d[d.length-1].cantidad;
+            }
+  
 
-
-                        cell1.innerHTML = data[i].fields.item;
-
-                        $.ajax({
-                            data: {'id':data[i].fields.producto},
-                            url: '/facturacion/buscar_producto',
-                            type: 'get',
-                            success: function(data){
-                                for (var i = 0; i < data.length; i++) {
-                                    cell2.innerHTML = " " + data[i].fields.nombre;
-                                }
-                            }
-
-                        });
-                        cell3.innerHTML = data[i].fields.producto;
-                        cell4.innerHTML = data[i].fields.precio;
-                        cell5.innerHTML = "<input type='text' value='" + data[i].fields.cantidad + "'/>";
-                        cell6.innerHTML = "Eliminar";
-                    }        
-                }              
-            });   
             var html = ""
             $('#producto-resultado').html(html);
             $('#producto-id').val('');
             $("#p-seleccionar").attr("disabled", true);
-            $('#buscarRemisionModal').modal('hide');  
-        });   
-    }); 
+            $('#buscarProductoModal').modal('hide');
+
+            $.ajax({                
+                url:"/facturacion/secuencia_item",
+                success:function(data){
+                    cell1.innerHTML = data.item;
+                    proceso.producto.push({'item': data.item, 'serial': d[d.length-1].pk, 'cantidad': d[d.length-1].cantidad});
+                }   
+            });
+                        
+        });     
+    });   
 
     function onEnviar(){
-        var item = 1;
-        $('#tb-detalle tbody tr').each(function () {
-            var idProd = $(this).find("td").eq(2).html();
-            var cantid = $(this).find("td").eq(4).find("input").val(); 
-            proceso.producto.push({'item': item, 'serial': idProd, 'cantidad': cantid});
-            item = item + 1;             
-        });
         console.log(JSON.stringify(proceso));
-        document.getElementById("proceso").value=JSON.stringify(proceso);
+       document.getElementById("proceso").value=JSON.stringify(proceso);
     }
 
-    $(function(){     
-        // Evento que selecciona la fila y la elimina 
-        $(document).on("click",".eliminar",function(){
-            var parent = $(this).parents().get(0);
-            $(parent).remove();
-        });
-    });
 
     </script>
 {% endblock %}

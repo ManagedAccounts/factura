@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render_to_response, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext
 from django.utils import timezone
 from django.views.generic import TemplateView
@@ -10,10 +10,10 @@ from django.core import serializers
 from django.db import connection
 import json
 # Create your views here.
-from .models import Cliente, Producto, Factura, DetalleFactura
+from .models import Cliente, Producto, Factura, DetalleFactura, CategoriaProducto
 from django.db import transaction
 from django.contrib import messages
-
+from .forms import ClienteForm, CategoriaForm, ProductoForm
 
 @login_required
 @transaction.atomic
@@ -101,7 +101,7 @@ def buscarProducto(request):
     idProducto = request.GET['id']
     producto = Producto.objects.filter(nombre__contains=idProducto)
     data = serializers.serialize(
-        'json', producto, fields=('code', 'nombre', 'precio', 'categoria', 'igv'))
+        'json', producto, fields=('code','stock', 'nombre', 'precio', 'categoria', 'igv'))
     return HttpResponse(data, mimetype='application/json')
 
 
@@ -118,7 +118,7 @@ def consultarFactura(request):
         detalles = DetalleFactura.objects.filter(factura=factura)
 
         for d in detalles:
-            
+
             sum_tax = sum_tax + d.impuesto
         sum_subtotal = factura.total-sum_tax
 
@@ -126,3 +126,111 @@ def consultarFactura(request):
                               {'factura': factura, 'detalles': detalles,
                                   'sum_subtotal': sum_subtotal, 'sum_tax': sum_tax},
                               context_instance=RequestContext(request))
+
+def clientes(request):
+    cliente=Cliente.objects.all()
+    return render(request, 'facturacion/clientes.html',{'cliente':cliente})
+
+def clienteAdd(request):
+    if request.method=='POST':
+        formulario=ClienteForm(request.POST)
+        if formulario.is_valid():
+            formulario.save()
+            return HttpResponseRedirect('/clientes')
+    else:
+        formulario=ClienteForm()
+    return render_to_response('facturacion/clienteAdd.html',
+                              {'formulario':formulario},
+                              context_instance=RequestContext(request))
+def clienteEdit (request, id):
+        cliente_edit= Cliente.objects.get(pk=id)
+        if request.method == 'POST':
+            formulario = ClienteForm(request.POST, instance = cliente_edit)
+            if formulario.is_valid():
+                formulario.save()
+                return HttpResponseRedirect("/clientes")
+        else:
+            formulario = ClienteForm(instance= cliente_edit)
+        return render_to_response('facturacion/clienteEdit.html',
+                    {'formulario': formulario},
+                    context_instance = RequestContext(request))
+def clienteDelete (request, id):
+    cliente_delete = get_object_or_404(Cliente, pk=id)
+    cliente_delete.delete()
+    return HttpResponseRedirect("/clientes")
+
+def productos(request):
+    productos=Producto.objects.all()
+    return render(request, 'facturacion/productos.html',
+                      {'productos':productos})
+
+def productoAdd(request):
+    if request.method=='POST':
+        formulario=ProductoForm(request.POST, request.FILES)
+        if formulario.is_valid():
+            formulario.save()
+            return HttpResponseRedirect('/productos')
+    else:
+        formulario=ProductoForm()
+    return render_to_response('facturacion/productoAdd.html',
+                              {'formulario':formulario},
+                              context_instance=RequestContext(request))
+
+
+
+def productoEdit (request, id):
+        producto_edit= Producto.objects.get(pk=id)
+        if request.method == 'POST':
+            formulario = ProductoForm(request.POST, instance = producto_edit)
+            if formulario.is_valid():
+                formulario.save()
+                return HttpResponseRedirect("/productos")
+        else:
+            formulario = ProductoForm(instance= producto_edit)
+        return render_to_response('facturacion/productoEdit.html',
+                    {'formulario': formulario},
+                    context_instance = RequestContext(request))
+
+def productoDelete (request, id):
+    producto_delete = get_object_or_404(Producto, pk=id)
+    producto_delete.delete()
+    return HttpResponseRedirect("/productos")
+
+
+def categoriaAdd(request):
+    if request.method=='POST':
+        formulario=CategoriaForm(request.POST)
+        if formulario.is_valid():
+            formulario.save()
+            return HttpResponseRedirect('/categoria')
+    else:
+        formulario=CategoriaForm()
+        return render_to_response('facturacion/categoriaAdd.html',
+                                  {'formulario':formulario},
+                                  context_instance=RequestContext(request))
+
+def categoriaEdit (request, id):
+        categoria_edit= CategoriaProducto.objects.get(pk=id)
+        if request.method == 'POST':
+            formulario = CategoriaForm(request.POST, instance = categoria_edit)
+            if formulario.is_valid():
+                formulario.save()
+                return HttpResponseRedirect("/categoria")
+        else:
+            formulario = CategoriaForm(instance= categoria_edit)
+        return render_to_response('facturacion/categoriaEdit.html',
+                    {'formulario': formulario},
+                    context_instance = RequestContext(request))
+
+def categoriaDelete (request, id):
+    categoria_delete = get_object_or_404(CategoriaProducto, pk=id)
+    categoria_delete.delete()
+    return HttpResponseRedirect("/categoria")
+
+
+def categoria(request):
+    categoria=CategoriaProducto.objects.all()
+    return render(request, 'facturacion/categoria.html',
+                      {'categoria':categoria})
+
+

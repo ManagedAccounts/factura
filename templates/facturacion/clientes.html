@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block contenido %}
+<p>Clientes registrados </p>
+    <a href="/clienteAdd/" class='btn btn-primary'>agregar</a>
+<table class='table table-striped'>
+    <thead>
+        <tr>
+            <th>ruc</th>
+            <th>razon social</th>
+            <th>direccion</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for clientes in cliente %}
+        <tr>
+            <td>{{clientes.ruc}}</td>
+            <td>{{clientes.razon_social}}</td>
+            <td>{{clientes.direccion}}</td>
+            <td><a href="/clienteEdit/{{clientes.id}}" class='btn btn-success'>editar</a></td>
+            <td><a href="/clienteDelete/{{clientes.id}}" class='btn btn-danger'>borrar</a></td> 
+        <tr>
+        {% empty %}
+        <tr>
+            <td>No hay Clientes registrados</td>
+        </tr>
+        {% endfor %}
+    </tbody>  
+
+    {% endblock %}
+    {% block footer %}
+    {% endblock %}

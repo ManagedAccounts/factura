@@ -26,7 +26,7 @@
             <div class="row">
                 <div class="col-xs-12">
                     <h2 class="page-header">
-                        <i class="fa fa-globe"></i> El Que Copia Pierde SAS.
+                        <i class="fa fa-globe"></i> Sistema S.A.
                         <small class="pull-right">Fecha: {% now "d/m/Y" %}</small>
                     </h2>                            
                 </div><!-- /.col -->
@@ -34,7 +34,7 @@
             <!-- info row -->
             <div class="row invoice-info">
                 <div class="col-sm-4 invoice-col">
-                    <strong>Despachador</strong><br>
+                    <strong>Cajero</strong><br>
                     Apellido: {{user.last_name}}<br>
                     Nombre: {{user.first_name}}<br>
                     Identificación: {{user.get_profile.numIdentificacion}}<br/>
@@ -232,6 +232,7 @@
                             html += 'Numero Serial: ' + data[i].pk + '<br>';
                             html += 'Nombre: ' + data[i].fields.nombre + '<br>';
                             html += 'Precio: ' + data[i].fields.precio + '<br>';
+                            html += 'Cantidad en Stock: ' + data[i].fields.stock + '<br>';
                             html += '<input name="p-cantidad" id="p-cantidad" placeholder="Cantidad" type="text">';
 
                             var fila = new Object();

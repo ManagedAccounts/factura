@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block contenido %}
+<form action="" method="post">
+    {% csrf_token %}
+    {{formulario.as_p}}
+    <button type="submit/button">guardar</button>
+</form>
+{% endblock %}

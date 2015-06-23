@@ -1,5 +1,7 @@
 from django.conf.urls import patterns, include, url
+from django.conf.urls.static import static
 from django.contrib import admin
+from django.conf import settings
 admin.autodiscover()
 
 urlpatterns = patterns(
@@ -20,28 +22,22 @@ urlpatterns = patterns(
     url(r'^factura/buscar_cliente$', 'apps.factura.views.buscarCliente'),
     url(r'^factura/buscar_producto$', 'apps.factura.views.buscarProducto'),
 
-    url(r'^factura/consultar$', 'apps.factura.views.consultarFactura', name="consultar_factura"),    
+    url(r'^factura/consultar$', 'apps.factura.views.consultarFactura', name="consultar_factura"),
 
-
+    #==================================================================
+    url(r'^clientes/$','apps.factura.views.clientes'),
+    url(r'^clienteAdd/$','apps.factura.views.clienteAdd'),
+    url(r'^clienteEdit/(?P<id>\d+)$','apps.factura.views.clienteEdit'),
+    url(r'^clienteDelete/(?P<id>\d+)$','apps.factura.views.clienteDelete'),
+    url(r'^productos/$','apps.factura.views.productos'),
+    url(r'^productoAdd/$','apps.factura.views.productoAdd'),
+    url(r'^productoEdit/(?P<id>\d+)$','apps.factura.views.productoEdit'),
+    url(r'^productoDelete/(?P<id>\d+)$','apps.factura.views.productoDelete'),
+    url(r'^categoria/$','apps.factura.views.categoria'),
+    url(r'^categoriaAdd/$','apps.factura.views.categoriaAdd'),
+    url(r'^categoriaEdit/(?P<id>\d+)$','apps.factura.views.categoriaEdit'),
+    url(r'^categoriaDelete/(?P<id>\d+)$','apps.factura.views.categoriaDelete'),
 
 )
 
-
-"""
-    url(r'^facturacion/orden$', 'apps.procesos.views.ordenCompraCrea', name="orden_compra"),
-    url(r'^facturacion/remision$', 'apps.procesos.views.remisionCompraCrea', name="remision_compra"),
-
-    url(r'^facturacion/buscar_cliente$', 'apps.procesos.views.buscarCliente'),
-    url(r'^facturacion/buscar_proveedor$', 'apps.procesos.views.buscarProveedor'),
-
-    url(r'^facturacion/buscar_producto$', 'apps.procesos.views.buscarProducto'),
-    url(r'^facturacion/secuencia_item$', 'apps.procesos.views.ejecutarSecuencia'),
-    url(r'^facturacion/descuento$', 'apps.procesos.views.descuentoProducto'),
-
-    url(r'^facturacion/buscar_orden$', 'apps.procesos.views.buscarOrdenCompra'),
-    url(r'^facturacion/buscar_orden_detalle$', 'apps.procesos.views.buscarOrdenDetalle'),
-
-    url(r'^inventario/consultar$', 'apps.procesos.views.consultarIntentario', name="consultar_inventario"),    
-
-    url(r'^producto/crear$', 'apps.procesos.views.productoCrear', name="crear_producto"),
-"""
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

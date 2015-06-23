@@ -28,13 +28,13 @@ class CategoriaProducto(models.Model):
 
 class Producto(models.Model):
     # codigo = models.IntegerField()
-    code = models.CharField(max_length=20, unique=True)
+    code = models.CharField(max_length=5, unique=True)
     number = models.IntegerField()
 
     categoria = models.ForeignKey(CategoriaProducto, null=True, blank=True)
     nombre = models.CharField(max_length=40)
     descripcion = models.TextField(max_length=300, null=True, blank=True)
-    imagen = models.ImageField(upload_to="productos/", null=True, blank=True)
+    imagen = models.ImageField(upload_to="productos",verbose_name='productos', null=True, blank=True)
     precio = models.DecimalField(max_digits=6, decimal_places=2)
     afecto = models.BooleanField(default=False)
     igv = models.DecimalField(max_digits=6, decimal_places=2)
@@ -56,9 +56,13 @@ class Producto(models.Model):
         return u'%s-%s' % (self.code, self.nombre)
 
     def save(self, *args, **kwargs):
-        self.igv = round(float(self.precio) * TAX_VALUE, 2)
-        super(Producto, self).save(*args, **kwargs)
 
+        if self.afecto==True:
+            self.igv = round(float(self.precio) * TAX_VALUE, 2)
+            super(Producto, self).save(*args, **kwargs)
+        else:
+            self.igv=0
+            super(Producto, self).save(*args, **kwargs)
 
 class Factura(models.Model):
     serie = models.IntegerField(max_length=3)

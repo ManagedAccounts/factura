@@ -11,6 +11,76 @@
     Core: General style
 ----------------------------
 */
+
+@font-face {
+  font-family: 'icono-fa';
+  src:url('../fonts/icomoon.eot?-ufku63');
+  src:url('../fonts/icomoon.eot?#iefix-ufku63') format('embedded-opentype'),
+    url('../fonts/icomoon.woff?-ufku63') format('woff'),
+    url('../fonts/icomoon.ttf?-ufku63') format('truetype'),
+    url('../fonts/icomoon.svg?-ufku63#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+
+.icon-cart:before {
+  font-family: "icono-fa";
+  content: "\e600";
+  
+}
+.icon-text:before {
+  font-family: "icono-fa";
+  content: "\e601";
+}
+.icon-trash:before {
+  font-family: "icono-fa";
+  content: "\e602";
+}
+.icon-paperclip:before {
+  font-family: "icono-fa";
+  content: "\e603";
+}
+.icon-organization:before {
+  font-family: "icono-fa";
+  content: "\f037";
+}
+.icon-pencil:before {
+  font-family: "icono-fa";
+  content: "\f058";
+}
+.icon-sync:before {
+  font-family: "icono-fa";
+  content: "\f087";
+}
+.icon-trashcan:before {
+  font-family: "icono-fa";
+  content: "\f0d0";
+}
+.icon-x:before {
+  font-family: "icono-fa";
+  content: "\f081";
+}
+.icon-plus:before {
+  font-family: "icono-fa";
+  content: "\e604";
+}
+.icon-android:before {
+  font-family: "icono-fa";
+  content: "\e605";
+}
+.icon-settings:before {
+  font-family: "icono-fa";
+  content: "\e606";
+}
+
+
+
+
+
+
+
 html,
 body {
   overflow-x: hidden!important;

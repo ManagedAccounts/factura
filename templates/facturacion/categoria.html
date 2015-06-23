@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block contenido %}
+<p>Categorias Registradas </p>
+    <a href="/categoriaAdd/" class='btn btn-success'>nueva</a>
+<table class='table table-striped'>
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>descripcion</th>
+            
+        </tr>
+    </thead>
+    <tbody>
+    {% for categorias in categoria %}
+        <tr>
+            <td>{{categorias.nombre}}</td>
+            <td>{{categorias.descripcion}}</td>
+            
+            <td><a href="/categoriaEdit/{{categorias.id}}" class='btn btn-info'>editar</a></td>
+            <td><a href="/categoriaDelete/{{categorias.id}}" class='btn btn-danger'>borrar</a></td> 
+        <tr>
+        {% empty %}
+        <tr>
+            <td>No hay Categorias registrados</td>
+        </tr>
+        {% endfor %}
+    </tbody>  
+
+    {% endblock %}
+    {% block footer %}
+    {% endblock %}
