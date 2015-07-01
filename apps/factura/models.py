@@ -9,7 +9,7 @@ TAX_VALUE = 0.18
 
 
 class Cliente(models.Model):
-    ruc = models.IntegerField(max_length=11, unique=True)
+    ruc = models.IntegerField(unique=True)
     razon_social = models.CharField(max_length=100)
     direccion = models.CharField(max_length=200)
     telefono = models.CharField(max_length=10)
@@ -65,7 +65,7 @@ class Producto(models.Model):
             super(Producto, self).save(*args, **kwargs)
 
 class Factura(models.Model):
-    serie = models.IntegerField(max_length=3)
+    serie = models.IntegerField()
     numero = models.CharField(max_length=6)
     cliente = models.ForeignKey(Cliente, null=True, blank=True)
     fecha = models.DateTimeField(auto_now_add=True)

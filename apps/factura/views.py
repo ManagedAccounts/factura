@@ -92,7 +92,7 @@ def buscarCliente(request):
     cliente = Cliente.objects.filter(ruc__contains=idCliente)
     data = serializers.serialize(
         'json', cliente, fields=('ruc', 'razon_social', 'direccion', 'telefono'))
-    return HttpResponse(data, mimetype='application/json')
+    return HttpResponse(data, content_type='application/json')
 
 # Busqueda de producto para factura
 
@@ -102,7 +102,7 @@ def buscarProducto(request):
     producto = Producto.objects.filter(nombre__contains=idProducto)
     data = serializers.serialize(
         'json', producto, fields=('code','stock', 'nombre', 'precio', 'categoria', 'igv'))
-    return HttpResponse(data, mimetype='application/json')
+    return HttpResponse(data, content_type='application/json')
 
 
 def consultarFactura(request):
